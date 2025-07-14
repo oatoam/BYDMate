@@ -1,0 +1,8 @@
+# Docker
+*.env
+*.log
+*.tmp
+*.bak
+*/target
+*/build
+*/dist
