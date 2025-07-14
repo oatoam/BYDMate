@@ -1,0 +1,32 @@
+apply plugin: 'com.android.application'
+
+android {
+    namespace 'com.toddmo.bydmate.server'
+    compileSdk 33
+    defaultConfig {
+        applicationId "com.toddmo.bydmate.server"
+        minSdkVersion 26
+        targetSdkVersion 35
+        versionCode 30100
+        versionName "3.1"
+        testInstrumentationRunner "android.support.test.runner.AndroidJUnitRunner"
+    }
+    buildTypes {
+        release {
+            minifyEnabled false
+            proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
+        }
+    }
+    buildFeatures {
+        buildConfig true
+        aidl true
+    }
+}
+
+dependencies {
+    testImplementation 'junit:junit:4.13.2'
+
+    implementation project(':datacollector')
+}
+
+// apply from: "$project.rootDir/config/android-checkstyle.gradle"
