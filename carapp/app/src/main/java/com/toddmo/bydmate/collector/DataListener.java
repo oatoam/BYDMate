@@ -3224,6 +3224,9 @@ public class DataListener {
         public void onSpeedChanged(double value) {
             super.onSpeedChanged(value);
             processer.put("speed", "Speed", String.valueOf(value));
+
+            int power = autoEngineDevice.getEnginePower();
+            processer.put("speed", "Power", String.valueOf(power));
         }
 
         @Override
