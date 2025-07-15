@@ -1,15 +1,3 @@
-07-06 11:33:21.586 10627 10726 D Klog    : com.toddmo.bydmate.client.helper.AdbHelper::setupCrypto:load adb key from /storage/emulated/0/Android/data/com.toddmo.bydmate.client/files/private.key /storage/emulated/0/Android/data/com.toddmo.bydmate.client/files/public.key
-07-06 11:48:17.840 16963 17103 D Klog    : com.toddmo.bydmate.client.helper.AdbHelper::setupCrypto:load adb key from /storage/emulated/0/Android/data/com.toddmo.bydmate.client/files/private.key /storage/emulated/0/Android/data/com.toddmo.bydmate.client/files/public.key
-07-06 11:50:26.261 17964 18063 D Klog    : com.toddmo.bydmate.client.helper.AdbHelper::setupCrypto:load adb key from /storage/emulated/0/Android/data/com.toddmo.bydmate.client/files/private.key /storage/emulated/0/Android/data/com.toddmo.bydmate.client/files/public.key
-07-06 11:51:29.900 18541 18641 D Klog    : com.toddmo.bydmate.client.helper.AdbHelper::setupCrypto:load adb key from /storage/emulated/0/Android/data/com.toddmo.bydmate.client/files/private.key /storage/emulated/0/Android/data/com.toddmo.bydmate.client/files/public.key
-07-06 11:51:31.849 18709 18709 D Klog    : com.toddmo.bydmate.server.Server::main:server running
-07-06 11:57:39.917 21082 21196 D Klog    : com.toddmo.bydmate.client.helper.AdbHelper::setupCrypto:load adb key from /storage/emulated/0/Android/data/com.toddmo.bydmate.client/files/private.key /storage/emulated/0/Android/data/com.toddmo.bydmate.client/files/public.key
-07-06 11:57:41.824 21242 21242 D Klog    : com.toddmo.bydmate.server.Server::main:server running
-07-06 12:02:12.455 22962 23053 D Klog    : com.toddmo.bydmate.client.helper.AdbHelper::setupCrypto:load adb key from /storage/emulated/0/Android/data/com.toddmo.bydmate.client/files/private.key /storage/emulated/0/Android/data/com.toddmo.bydmate.client/files/public.key
-07-06 12:02:14.384 23095 23095 D Klog    : com.toddmo.bydmate.server.Server::main:server running
-07-06 12:02:14.492 23095 23095 D Klog    : com.toddmo.bydmate.server.Server::main:server loop ing
-07-06 12:06:18.811 24797 24956 D Klog    : com.toddmo.bydmate.client.helper.AdbHelper::setupCrypto:load adb key from /storage/emulated/0/Android/data/com.toddmo.bydmate.client/files/private.key /storage/emulated/0/Android/data/com.toddmo.bydmate.client/files/public.key
-07-06 12:06:20.800 25015 25015 D Klog    : com.toddmo.bydmate.server.Server::main:server running
 ac  Temperature   26
 ac  TemperatureUnit   1
 ac  AcWindLevel   1
@@ -151,9 +139,6 @@ tyre  TyreAirLeakState   -2147482645
 tyre  TyreSignalState   -2147482645
 tyre  TyrePressureState   -2147482645
 tyre  TyrePressureValue   -2147482645
-07-06 12:06:21.079 25015 25015 D Klog    : com.toddmo.bydmate.server.Server::main:server loop ing
-07-06 12:09:53.764 26208 26423 D Klog    : com.toddmo.bydmate.client.helper.AdbHelper::setupCrypto:load adb key from /storage/emulated/0/Android/data/com.toddmo.bydmate.client/files/private.key /storage/emulated/0/Android/data/com.toddmo.bydmate.client/files/public.key
-07-06 12:09:55.702 26479 26479 D Klog    : com.toddmo.bydmate.server.Server::main:server running
 ac  Temperature   26
 ac  TemperatureUnit   1
 ac  AcWindLevel   1
@@ -295,11 +280,6 @@ tyre  TyreAirLeakState   -2147482645
 tyre  TyreSignalState   -2147482645
 tyre  TyrePressureState   -2147482645
 tyre  TyrePressureValue   -2147482645
-07-06 12:09:55.917 26479 26479 D Klog    : com.toddmo.bydmate.server.Server::main:Joining Binder thread pool...
-07-06 12:12:40.116 27474 27643 D Klog    : com.toddmo.bydmate.client.helper.AdbHelper::setupCrypto:load adb key from /storage/emulated/0/Android/data/com.toddmo.bydmate.client/files/private.key /storage/emulated/0/Android/data/com.toddmo.bydmate.client/files/public.key
-07-06 12:12:42.073 27687 27687 D Klog    : com.toddmo.bydmate.server.Server::main:server running
-07-06 12:15:36.431 28677 28810 D Klog    : com.toddmo.bydmate.client.helper.AdbHelper::setupCrypto:load adb key from /storage/emulated/0/Android/data/com.toddmo.bydmate.client/files/private.key /storage/emulated/0/Android/data/com.toddmo.bydmate.client/files/public.key
-07-06 12:15:38.424 28858 28858 D Klog    : com.toddmo.bydmate.server.Server::main:server running
 ac  Temperature   26
 ac  TemperatureUnit   1
 ac  AcWindLevel   1
@@ -441,7 +421,6 @@ tyre  TyreAirLeakState   -2147482645
 tyre  TyreSignalState   -2147482645
 tyre  TyrePressureState   -2147482645
 tyre  TyrePressureValue   -2147482645
-07-06 12:15:38.697 28858 28858 D Klog    : com.toddmo.bydmate.server.Server::main:begin looping...
 instrument  AlarmBuzzleState   1
 sensor  AccSensorData   [3, 31, 3, 30, 0, 0, 0, 0, 1]
 instrument  AlarmBuzzleState   0

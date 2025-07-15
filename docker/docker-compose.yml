@@ -12,6 +12,7 @@ services:
       POSTGRES_DB: byd_mate
     volumes:
       - postgres_data:/var/lib/postgresql/data
+      - ../backend/data_analyzer/schema.sql:/docker-entrypoint-initdb.d/10-schema.sql
 
   influxdb:
     image: influxdb:2.7
@@ -29,7 +30,7 @@ services:
       - influxdb_data:/var/lib/influxdb2
 
   emqx:
-    image: emqx/emqx:5.0.0
+    image: emqx/emqx:5.10.0
     restart: always
     ports:
       - "1883:1883" # MQTT TCP
@@ -42,60 +43,46 @@ services:
       EMQX_LISTENERS__TCP__DEFAULT__BIND: 0.0.0.0:1883
       EMQX_LISTENERS__WS__DEFAULT__BIND: 0.0.0.0:8083
       EMQX_REST__LISTENERS__HTTP__BIND: 0.0.0.0:8084
+    volumes: []
 
-  zookeeper:
-    image: confluentinc/cp-zookeeper:7.5.0
+  mqtt_subscriber:
+    build:
+      context: ../backend/mqtt_subscriber
+      dockerfile: Dockerfile
     restart: always
-    ports:
-      - "2181:2181"
     environment:
-      ZOOKEEPER_CLIENT_PORT: 2181
-      ZOOKEEPER_TICK_TIME: 2000
-
-  kafka:
-    image: confluentinc/cp-kafka:7.5.0
-    restart: always
-    ports:
-      - "9092:9092"
-    environment:
-      KAFKA_BROKER_ID: 1
-      KAFKA_ZOOKEEPER_CONNECT: zookeeper:2181
-      KAFKA_ADVERTISED_LISTENERS: PLAINTEXT://kafka:29092,PLAINTEXT_HOST://localhost:9092
-      KAFKA_LISTENER_SECURITY_PROTOCOL_MAP: PLAINTEXT:PLAINTEXT,PLAINTEXT_HOST:PLAINTEXT
-      KAFKA_INTER_BROKER_LISTENER_NAME: PLAINTEXT
-      KAFKA_OFFSETS_TOPIC_REPLICATION_FACTOR: 1
+      MQTT_BROKER: emqx:1883
+      INFLUXDB_URL: http://influxdb:8086
+      INFLUXDB_TOKEN: my-super-secret-token
+      INFLUXDB_ORG: byd_org
+      INFLUXDB_BUCKET: byd_bucket
     depends_on:
-      - zookeeper
+      - emqx
+      - influxdb
 
-  flink-jobmanager:
-    image: flink:latest-scala_2.12
+  data_analyzer:
+    build:
+      context: ../backend/data_analyzer
+      dockerfile: Dockerfile
     restart: always
     ports:
-      - "8081:8081"
-    command: jobmanager
+      - "8081:8081" # API Port
     environment:
-      - |
-        FLINK_PROPERTIES=
-        jobmanager.rpc.address: flink-jobmanager
-        taskmanager.numberOfTaskSlots: 1
-    volumes:
-      - flink_shared_data:/opt/flink/usrlib
-
-  flink-taskmanager:
-    image: flink:latest-scala_2.12
-    restart: always
-    command: taskmanager
-    environment:
-      - |
-        FLINK_PROPERTIES=
-        jobmanager.rpc.address: flink-jobmanager
-        taskmanager.numberOfTaskSlots: 1
-    volumes:
-      - flink_shared_data:/opt/flink/usrlib
+      MQTT_BROKER: emqx:1883
+      INFLUXDB_URL: http://influxdb:8086
+      INFLUXDB_TOKEN: my-super-secret-token
+      INFLUXDB_ORG: byd_org
+      INFLUXDB_BUCKET: byd_bucket
+      PG_HOST: postgres
+      PG_PORT: 5432
+      PG_USER: user
+      PG_PASSWORD: password
+      PG_DBNAME: byd_mate
     depends_on:
-      - flink-jobmanager
+      - emqx
+      - influxdb
+      - postgres
 
 volumes:
   postgres_data:
   influxdb_data:
-  flink_shared_data:
