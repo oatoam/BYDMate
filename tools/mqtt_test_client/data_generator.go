@@ -11,6 +11,7 @@ import (
 
 // DataPoint represents a single data point with category, key, and value.
 type DataPoint struct {
+	Vin      string      `json:"vin"`
 	Category string      `json:"category"`
 	Key      string      `json:"key"`
 	Value    interface{} `json:"value"`
@@ -44,41 +45,67 @@ func loadDataFromFile(filePath string) ([]LogDataPoint, error) {
 			continue
 		}
 
-		parts := strings.Fields(line)
+		// Expected format: "MM-DD HH:MM:SS.ms >> type // Key = Value"
+		// Example: "07-06 12:15:38.575 >> ac // Temperature = 26"
 
-		// Try to parse as timestamp line
-		if len(parts) >= 2 && len(parts[0]) == 5 && parts[0][2] == '-' && len(parts[1]) == 8 && parts[1][2] == ':' && parts[1][5] == ':' {
-			// This is a log line, skip it
+		// Split by " >> " to separate timestamp and the rest
+		timestampAndRest := strings.SplitN(line, " >> ", 2)
+		if len(timestampAndRest) != 2 {
+			fmt.Printf("Skipping malformed line (missing ' >> ' separator) %d: %s\n", lineNum, line)
 			continue
 		}
 
-		// Try to parse as category key value line
-		if len(parts) >= 2 {
-			category := parts[0]
-			key := parts[1]
-			valueStr := strings.Join(parts[2:], " ")
-			
-			var value interface{}
-			// Attempt to parse value as float64
-			if f, err := strconv.ParseFloat(valueStr, 64); err == nil {
-				value = f
-			} else if b, err := strconv.ParseBool(valueStr); err == nil {
-				value = b
-			} else if i, err := strconv.ParseInt(valueStr, 10, 64); err == nil {
-				value = i
-			} else {
-				value = valueStr
-			}
-
-			dataPoints = append(dataPoints, LogDataPoint{
-				Timestamp: time.Now(), // Placeholder, actual timestamp will be from log line or current time
-				Category:  category,
-				Key:       key,
-				Value:     value,
-			})
-		} else {
-			fmt.Printf("Skipping malformed data line %d: %s\n", lineNum, line)
+		// Parse timestamp
+		timestampStr := timestampAndRest[0]
+		// Assuming the year is current year for parsing
+		currentYear := time.Now().Year()
+		// Format: "07-06 12:15:38.575" -> "YYYY-MM-DD HH:MM:SS.ms"
+		parsedTime, err := time.Parse(fmt.Sprintf("01-02 15:04:05.000"), timestampStr)
+		if err != nil {
+			fmt.Printf("Skipping malformed line (timestamp parse error) %d: %s, Error: %v\n", lineNum, line, err)
+			continue
 		}
+		// Set the year to the current year
+		parsedTime = parsedTime.AddDate(currentYear - parsedTime.Year(), 0, 0)
+
+
+		// Split the rest by " // " to separate type and key-value pair
+		typeAndKeyValue := strings.SplitN(timestampAndRest[1], " // ", 2)
+		if len(typeAndKeyValue) != 2 {
+			fmt.Printf("Skipping malformed line (missing ' // ' separator) %d: %s\n", lineNum, line)
+			continue
+		}
+
+		dataType := strings.TrimSpace(typeAndKeyValue[0]) // This is the 'type' (e.g., "ac")
+
+		// Split key-value pair by " = "
+		keyAndValue := strings.SplitN(typeAndKeyValue[1], " = ", 2)
+		if len(keyAndValue) != 2 {
+			fmt.Printf("Skipping malformed line (missing ' = ' separator) %d: %s\n", lineNum, line)
+			continue
+		}
+
+		key := strings.TrimSpace(keyAndValue[0])
+		valueStr := strings.TrimSpace(keyAndValue[1])
+
+		var value interface{}
+		// Attempt to parse value as float64, then bool, then int, otherwise keep as string
+		if f, err := strconv.ParseFloat(valueStr, 64); err == nil {
+			value = f
+		} else if b, err := strconv.ParseBool(valueStr); err == nil {
+			value = b
+		} else if i, err := strconv.ParseInt(valueStr, 10, 64); err == nil {
+			value = i
+		} else {
+			value = valueStr
+		}
+
+		dataPoints = append(dataPoints, LogDataPoint{
+			Timestamp: parsedTime,
+			Category:  dataType, // Using Category for 'type'
+			Key:       key,
+			Value:     value,
+		})
 	}
 
 	if err := scanner.Err(); err != nil {

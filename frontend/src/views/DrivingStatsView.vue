@@ -58,12 +58,12 @@ import { ElCard, ElRow, ElCol, ElStatistic, ElDivider } from 'element-plus';
 const drivingStats = ref<any[]>([]);
 
 const totalDrivingCount = computed(() => drivingStats.value.reduce((sum, item) => sum + item.driving_count, 0));
-const totalMileage = computed(() => drivingStats.value.reduce((sum, item) => sum + item.total_mileage, 0).toFixed(2));
-const totalFuelConsumption = computed(() => drivingStats.value.reduce((sum, item) => sum + item.total_fuel_consumption, 0).toFixed(2));
-const totalElectricConsumption = computed(() => drivingStats.value.reduce((sum, item) => sum + item.total_electric_consumption, 0).toFixed(2));
-const avgMileagePerDrive = computed(() => (totalMileage.value / totalDrivingCount.value).toFixed(2));
-const avgFuelConsumptionPerDrive = computed(() => (totalFuelConsumption.value / totalDrivingCount.value).toFixed(2));
-const avgElectricConsumptionPerDrive = computed(() => (totalElectricConsumption.value / totalDrivingCount.value).toFixed(2));
+const totalMileage = computed(() => parseFloat(drivingStats.value.reduce((sum, item) => sum + item.total_mileage, 0).toFixed(2)));
+const totalFuelConsumption = computed(() => parseFloat(drivingStats.value.reduce((sum, item) => sum + item.total_fuel_consumption, 0).toFixed(2)));
+const totalElectricConsumption = computed(() => parseFloat(drivingStats.value.reduce((sum, item) => sum + item.total_electric_consumption, 0).toFixed(2)));
+const avgMileagePerDrive = computed(() => parseFloat((totalMileage.value / totalDrivingCount.value).toFixed(2)));
+const avgFuelConsumptionPerDrive = computed(() => parseFloat((totalFuelConsumption.value / totalDrivingCount.value).toFixed(2)));
+const avgElectricConsumptionPerDrive = computed(() => parseFloat((totalElectricConsumption.value / totalDrivingCount.value).toFixed(2)));
 
 const drivingStatsChartOption = computed(() => {
   const dates = drivingStats.value.map(item => item.stat_date);

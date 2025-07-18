@@ -26,20 +26,24 @@
 </template>
 
 <script setup lang="ts">
-import { defineProps, defineEmits, ref, watch } from 'vue';
+import { defineProps, defineEmits, ref, watch, type PropType } from 'vue';
 import { ElTable, ElTableColumn, ElPagination } from 'element-plus';
+
+interface TableColumn {
+  prop: string;
+  label: string;
+  width?: string | number;
+  formatter?: (row: any, column: any, cellValue: any, index: number) => string;
+  slot?: string;
+}
 
 const props = defineProps({
   data: {
-    type: Array,
+    type: Array as PropType<any[]>,
     default: () => [],
   },
   columns: {
-    type: Array,
-    default: () => [],
-  },
-  columns: {
-    type: Array,
+    type: Array as PropType<TableColumn[]>,
     default: () => [],
   },
   loading: {
@@ -63,7 +67,7 @@ const props = defineProps({
     default: 10,
   },
   pageSizes: {
-    type: Array,
+    type: Array as PropType<number[]>,
     default: () => [10, 20, 50, 100],
   },
   paginationLayout: {

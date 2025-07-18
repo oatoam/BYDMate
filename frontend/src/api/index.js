@@ -5,7 +5,7 @@ import axios from 'axios';
 const USE_MOCK_API = import.meta.env.VITE_USE_MOCK_API === 'true';
 
 const request = axios.create({
-  baseURL: 'http://localhost:8081/api', // 后端API的基础路径
+  baseURL: `${window.location.protocol}//${window.location.hostname}:8081/api`, // 后端API的基础路径
   timeout: 5000
 });
 

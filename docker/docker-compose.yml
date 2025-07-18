@@ -1,4 +1,4 @@
-version: '3.8'
+name: bydmate
 
 services:
   postgres:
@@ -12,7 +12,7 @@ services:
       POSTGRES_DB: byd_mate
     volumes:
       - postgres_data:/var/lib/postgresql/data
-      - ../backend/data_analyzer/schema.sql:/docker-entrypoint-initdb.d/10-schema.sql
+      - ./configuration/postgres/schema.sql:/docker-entrypoint-initdb.d/10-schema.sql
 
   influxdb:
     image: influxdb:2.7
@@ -27,7 +27,7 @@ services:
       DOCKER_INFLUXDB_INIT_BUCKET: byd_bucket
       DOCKER_INFLUXDB_INIT_ADMIN_TOKEN: my-super-secret-token
     volumes:
-      - influxdb_data:/var/lib/influxdb2
+      - influx_data:/var/lib/influxdb2
 
   emqx:
     image: emqx/emqx:5.10.0
@@ -83,6 +83,30 @@ services:
       - influxdb
       - postgres
 
+  frontend:
+    build:
+      context: ../frontend
+      dockerfile: Dockerfile
+    ports:
+      - "8080:80"
+    restart: always
+
 volumes:
+  influx_data:
+    driver: local
+    driver_opts:
+      type: none
+      o: bind
+      device: ./data/influx
   postgres_data:
-  influxdb_data:
+    driver: local
+    driver_opts:
+      type: none
+      o: bind
+      device: ./data/postgres
+  configuration:
+    driver: local
+    driver_opts:
+      type: none
+      o: bind
+      device: ./configuration

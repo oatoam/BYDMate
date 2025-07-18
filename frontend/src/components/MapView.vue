@@ -3,7 +3,7 @@
 </template>
 
 <script setup lang="ts">
-import { ref, onMounted, onUnmounted, watch, defineProps } from 'vue';
+import { ref, onMounted, onUnmounted, watch, defineProps, type PropType } from 'vue';
 
 const props = defineProps({
   center: {
@@ -23,13 +23,13 @@ const props = defineProps({
     default: () => [], // [[lng, lat], [lng, lat], ...]
   },
   pathColors: {
-    type: Array,
+    type: Array as PropType<string[]>,
     default: () => [], // ['#FF0000', '#0000FF', ...]
   },
 });
 
 const mapContainer = ref<HTMLElement | null>(null);
-let map: AMap.Map | null = null;
+let map: AMap.Map | undefined = undefined;
 const polyline: AMap.Polyline[] = [];
 const markers: AMap.Marker[] = [];
 
