@@ -126,3 +126,12 @@ CREATE TABLE IF NOT EXISTS batteries (
     dc_charge_kwh NUMERIC(10, 2),
     hev_charge_kwh NUMERIC(10, 2)
 );
+
+CREATE TABLE IF NOT EXISTS rawdata (
+    id SERIAL PRIMARY KEY,
+    vin VARCHAR(255) NOT NULL,
+    category VARCHAR(255) NOT NULL,
+    key VARCHAR(255) NOT NULL,
+    value TEXT,
+    timestamp TIMESTAMPTZ NOT NULL
+);
