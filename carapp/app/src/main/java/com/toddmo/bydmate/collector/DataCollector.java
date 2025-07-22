@@ -57,6 +57,7 @@ public class DataCollector {
 
     public DataCollector(Context context) {
         mContext = context;
+        mDataCache = new DataProcesser(mContext);
     }
 
     public void initialize() {
@@ -128,7 +129,7 @@ public class DataCollector {
     }
 
 //    Map<String, String> mDataCache = new HashMap<>();
-    DataProcesser mDataCache = new DataProcesser();
+    DataProcesser mDataCache = null;
 
     private final AbsBYDAutoSettingListener absBYDAutoSettingListener = new AbsBYDAutoSettingListener() {
         /**

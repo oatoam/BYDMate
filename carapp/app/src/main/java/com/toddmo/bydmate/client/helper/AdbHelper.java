@@ -11,7 +11,6 @@ import com.tananaev.adblib.AdbBase64;
 import com.tananaev.adblib.AdbConnection;
 import com.tananaev.adblib.AdbCrypto;
 import com.tananaev.adblib.AdbStream;
-import com.toddmo.bydmate.client.helper.FileUtils;
 import com.toddmo.bydmate.client.utils.KLog;
 
 import java.io.File;
@@ -172,7 +171,7 @@ public class AdbHelper {
         }
     }
 
-    public ADBCommandThread sendAdbShellCommand(String shellCommand) {
+    public ADBCommandThread executeAsync(String shellCommand) {
         String remoteHost = "127.0.0.1";
         int remotePort = 5555;
 
@@ -201,7 +200,7 @@ public class AdbHelper {
             @Override
             public void run() {
                 AdbHelper.ADBCommandThread command =
-                        adb.sendAdbShellCommand(String.format("ping 127.0.0.1"));
+                        adb.executeAsync(String.format("ping 127.0.0.1"));
 
                 if (command == null) {
                     com.toddmo.bydmate.client.utils.KLog.e("sendAdbShellCommand failed");

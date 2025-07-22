@@ -4,6 +4,9 @@ import android.content.Context;
 import android.hardware.bydauto.BYDAutoEventValue;
 import java.util.Arrays;
 import android.hardware.bydauto.ac.AbsBYDAutoAcListener;
+
+import com.toddmo.bydmate.client.utils.DataHolder;
+import com.toddmo.bydmate.client.utils.EnvironmentUtils;
 import com.toddmo.bydmate.collector.LocationTracker;
 import android.hardware.bydauto.ac.BYDAutoAcDevice;
 import android.hardware.bydauto.bodywork.AbsBYDAutoBodyworkListener;
@@ -63,7 +66,9 @@ public class DataListener {
     Context mContext;
     public DataListener(Context context) {
         mContext = context;
-        processer = new DataProcesser(mContext); // Pass context to DataProcesser
+
+
+
 
         autoAcDevice = BYDAutoAcDevice.getInstance(mContext);
         autoBodyworkDevice = BYDAutoBodyworkDevice.getInstance(mContext);
@@ -97,10 +102,41 @@ public class DataListener {
         autoStatisticDevice.registerListener(statisticListener);
         autoTyreDevice.registerListener(tyreListener);
 
-        fetchFristValueForEachKey();
+        if (!EnvironmentUtils.isEmulator()) {
+            fetchFristValueForEachKey();
+        }
+
+        String VIN = DataHolder.get("VIN");
+        if (VIN == null || VIN.isEmpty()) {
+            VIN = "SAMPLE_VIN_XX112233";
+            DataHolder.put("VIN", VIN);
+        }
+
+        processer = new DataProcesser(mContext); // Pass context to DataProcesser
 
         locationTracker = new LocationTracker(mContext, processer);
         locationTracker.startTracking();
+
+        if (EnvironmentUtils.isEmulator()) {
+            new Thread(new Runnable() {
+                @Override
+                public void run() {
+
+                    while (true) {
+                        StringBuilder dataBuilder = new StringBuilder();
+                        for (int i = 0; i < 10; i++) {
+                            dataBuilder.append((char) ('A' + (int) (Math.random() * 26)));
+                        }
+                        String data = dataBuilder.toString();
+                        processer.put("fakedata", "online", data);
+                        try {
+                            Thread.sleep(1500);
+                        } catch (Exception e) {}
+                    }
+
+                }
+            }).start();
+        }
     }
 
     DataProcesser processer;
@@ -109,6 +145,11 @@ public class DataListener {
         // AC Listener
 //        int acWindModeShownState = autoAcDevice.getAcWindModeShownState();
 //        processer.put("ac", "AcWindModeShownState", String.valueOf(acWindModeShownState));
+
+        String autoVIN = autoBodyworkDevice.getAutoVIN();
+        processer.put("bodywork", "AutoVIN", autoVIN);
+
+        DataHolder.getInstance().put("VIN", autoVIN);
 
         int temperature = autoAcDevice.getTemprature(BYDAutoAcDevice.AC_TEMPERATURE_MAIN);
         processer.put("ac", "Temperature", String.valueOf(temperature));
@@ -173,9 +214,6 @@ public class DataListener {
 
 //        int powerDayMode = autoBodyworkDevice.getPowerDayMode();
 //        processer.put("bodywork", "PowerDayMode", String.valueOf(powerDayMode));
-
-        String autoVIN = autoBodyworkDevice.getAutoVIN();
-        processer.put("bodywork", "AutoVIN", autoVIN);
 
         int moonRoofConfig = autoBodyworkDevice.getMoonRoofConfig();
         processer.put("bodywork", "MoonRoofConfig", String.valueOf(moonRoofConfig));
@@ -284,9 +322,14 @@ public class DataListener {
         // NoSuchMethodError
 //        int chargingMode = autoChargingDevice.getChargingMode();
 //        processer.put("charging", "ChargingMode", String.valueOf(chargingMode));
+        // Check if the device is an emulator
 
-        ChargingTimerInfo chargingTimerInfo = autoChargingDevice.getChargingTimerInfo(0);
-        processer.put("charging", "ChargingTimerInfo", String.valueOf(chargingTimerInfo));
+
+        if (!EnvironmentUtils.isEmulator()) {
+            ChargingTimerInfo chargingTimerInfo = autoChargingDevice.getChargingTimerInfo(0);
+            processer.put("charging", "ChargingTimerInfo", String.valueOf(chargingTimerInfo));
+        }
+
 
         int wirelessChargingSwitchState = autoChargingDevice.getWirelessChargingSwitchState();
         processer.put("charging", "WirelessChargingSwitchState", String.valueOf(wirelessChargingSwitchState));

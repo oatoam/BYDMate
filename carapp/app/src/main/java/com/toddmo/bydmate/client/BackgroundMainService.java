@@ -18,7 +18,9 @@ import androidx.core.app.NotificationCompat;
 
 import com.toddmo.bydmate.client.helper.AdbHelper;
 import com.toddmo.bydmate.client.helper.FileUtils;
+import com.toddmo.bydmate.client.utils.EnvironmentUtils;
 import com.toddmo.bydmate.client.utils.KLog;
+import com.toddmo.bydmate.collector.DataListener;
 
 public class BackgroundMainService extends Service {
 
@@ -50,8 +52,9 @@ public class BackgroundMainService extends Service {
     @Override
     public void onCreate() {
         super.onCreate();
-        createNotificationChannel();
-
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+            createNotificationChannel();
+        }
         KLog.d("BackgroundMainService onCreate");
     }
 
@@ -79,40 +82,46 @@ public class BackgroundMainService extends Service {
 
        //                AdbHelper.testAdbConnection(SplashActivity.this);
 
-       new Thread(new Runnable() {
-           @Override
-           public void run() {
-               AdbHelper adb = AdbHelper.getInstance();
-               Context ctx = getBaseContext();
-               adb.setupCrypto(ctx);
-               String sdcard = FileUtils.getSDCardPath(ctx);
 
-               String sourceDir = getApplicationContext().getApplicationInfo().sourceDir;
+       if (EnvironmentUtils.isEmulator()) {
+           DataListener listener = new DataListener(this);
+       } else {
+           new Thread(new Runnable() {
+               @Override
+               public void run() {
+                   AdbHelper adb = AdbHelper.getInstance();
+                   Context ctx = getBaseContext();
+                   adb.setupCrypto(ctx);
+                   String sdcard = FileUtils.getSDCardPath(ctx);
 
-
-
-               String shPath = sdcard + "/" + SH_NAME;
-
-               FileUtils.copyAssetFileToDir(ctx, SH_NAME, sdcard);
-
-               adb.sendAdbShellCommand(String.format("mkdir -p /data/local/tmp/bydmate/"));
-               try { Thread.sleep(300); } catch (Exception e) {}
-               adb.sendAdbShellCommand(String.format("cp -v %s /data/local/tmp/bydmate/", shPath));
-               try { Thread.sleep(300); } catch (Exception e) {}
-
-               adb.sendAdbShellCommand(String.format("chmod +x /data/local/tmp/bydmate/%s", SH_NAME));
-               try { Thread.sleep(300); } catch (Exception e) {}
-
-               adb.sendAdbShellCommand(String.format("pkill -f %s", CLASS_NAME));
-               try { Thread.sleep(300); } catch (Exception e) {}
-
-               adb.sendAdbShellCommand(String.format("/data/local/tmp/bydmate/%s " +
-                       "%s %s", SH_NAME, sourceDir, CLASS_NAME));
-           }
-       }).start();
+                   String sourceDir = getApplicationContext().getApplicationInfo().sourceDir;
 
 
-       KLog.d("BackgroundMainService onStartCommand reason = " + reason);
+
+                   String shPath = sdcard + "/" + SH_NAME;
+
+                   FileUtils.copyAssetFileToDir(ctx, SH_NAME, sdcard);
+
+                   adb.executeAsync(String.format("mkdir -p /data/local/tmp/bydmate/"));
+                   try { Thread.sleep(300); } catch (Exception e) {}
+                   adb.executeAsync(String.format("cp -v %s /data/local/tmp/bydmate/", shPath));
+                   try { Thread.sleep(300); } catch (Exception e) {}
+
+                   adb.executeAsync(String.format("chmod +x /data/local/tmp/bydmate/%s", SH_NAME));
+                   try { Thread.sleep(300); } catch (Exception e) {}
+
+                   adb.executeAsync(String.format("pkill -f %s", CLASS_NAME));
+                   try { Thread.sleep(300); } catch (Exception e) {}
+
+                   adb.executeAsync(String.format("/data/local/tmp/bydmate/%s " +
+                           "%s %s", SH_NAME, sourceDir, CLASS_NAME));
+               }
+           }).start();
+       }
+
+
+
+       KLog.d("BackgroundMainService onStartCommand reason = " + reason + " isEmulator " + EnvironmentUtils.isEmulator());
 
        Toast.makeText(this, "bydmate后台服务已启动: " + reason, Toast.LENGTH_SHORT).show();
 
@@ -147,7 +156,7 @@ public class BackgroundMainService extends Service {
             @Override
             public void run() {
                 AdbHelper adb = AdbHelper.getInstance();
-                adb.sendAdbShellCommand(String.format("pkill -f %s", CLASS_NAME));
+                adb.executeAsync(String.format("pkill -f %s", CLASS_NAME));
             }
         }).start();
 

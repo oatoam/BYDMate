@@ -56,4 +56,12 @@ dependencies {
 //    implementation project(':datacollector')
     compileOnly project(path: ':byd_sdk_33')
 
+    def room_version = "2.5.0" // 请检查最新版本并替换
+
+    implementation "androidx.room:room-runtime:$room_version"
+    annotationProcessor "androidx.room:room-compiler:$room_version" // 如果您使用的是 Java
+
+    implementation 'org.eclipse.paho:org.eclipse.paho.client.mqttv3:1.2.5'
+    implementation 'com.github.luben:zstd-jni:1.5.5-4@aar'
+    testImplementation 'com.github.luben:zstd-jni:1.5.2-3'
 }

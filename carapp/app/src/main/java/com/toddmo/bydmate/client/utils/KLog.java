@@ -8,7 +8,7 @@ public class KLog {
 
     private static void print(int level, String content) {
         StackTraceElement[] stackTraceElements = Thread.currentThread().getStackTrace();
-        Log.println(level, TAG, stackTraceElements[4].getClassName() + "::" + stackTraceElements[4].getMethodName() + ":" + content);
+        Log.println(level, TAG, stackTraceElements[4].getMethodName() + ":" + content);
     }
 
     public static void e(String content) {
