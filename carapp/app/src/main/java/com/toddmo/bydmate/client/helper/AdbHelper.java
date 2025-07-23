@@ -3,7 +3,6 @@ package com.toddmo.bydmate.client.helper;
 import android.content.Context;
 import android.os.Build;
 import android.os.Handler;
-import android.util.Log;
 
 import androidx.annotation.RequiresApi;
 
@@ -143,7 +142,7 @@ public class AdbHelper {
                 try {
                     while (!mInterrupted) {
                         byte[] data = stream.read();
-                        Log.v(TAG, "shell output: " + new String(data));
+                        KLog.v("shell output: " + new String(data));
                     }
                 } catch (IOException e) {
                     e.printStackTrace();
@@ -172,6 +171,7 @@ public class AdbHelper {
     }
 
     public ADBCommandThread executeAsync(String shellCommand) {
+        KLog.d(shellCommand);
         String remoteHost = "127.0.0.1";
         int remotePort = 5555;
 

@@ -30,8 +30,6 @@ public class FileUtils {
         String assetFileName = new File(assetFilePath).getName();
         File binaryFile = new File(destinationDir, assetFileName);
 
-//        Log.d(TAG, "path = " + binaryFile.getPath());
-
         // 如果文件已存在且不需要更新，则跳过
 //        if (binaryFile.exists()) {
 //            return binaryFile.getAbsolutePath();

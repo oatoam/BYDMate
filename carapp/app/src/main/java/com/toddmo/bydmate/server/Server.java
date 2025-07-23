@@ -6,7 +6,21 @@ import com.toddmo.bydmate.client.utils.KLog;
 import android.os.Looper;
 
 public class Server {
+
+    final static String TAG = Server.class.getName();
+
     public static void main(String[] args) {
+
+
+
+        KLog.setLogCallback(new KLog.LogCallback() {
+            @Override
+            public void onLog(String log) {
+                KLog.sendUDPLog(log);
+            }
+        });
+
+        KLog.sendUDPLog("test udp log from " + TAG);
 
         KLog.d("server running");
 

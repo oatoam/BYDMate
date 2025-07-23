@@ -10,7 +10,6 @@ import android.content.SharedPreferences;
 import android.os.Build;
 import android.os.IBinder;
 import android.preference.PreferenceManager;
-import android.util.Log;
 import android.widget.Toast;
 
 import androidx.annotation.RequiresApi;
@@ -18,6 +17,7 @@ import androidx.core.app.NotificationCompat;
 
 import com.toddmo.bydmate.client.helper.AdbHelper;
 import com.toddmo.bydmate.client.helper.FileUtils;
+import com.toddmo.bydmate.client.helper.ServiceHelper;
 import com.toddmo.bydmate.client.utils.EnvironmentUtils;
 import com.toddmo.bydmate.client.utils.KLog;
 import com.toddmo.bydmate.collector.DataListener;
@@ -62,7 +62,7 @@ public class BackgroundMainService extends Service {
     public int onStartCommand(Intent intent, int flags, int startId) {
 
 
-        Log.d(TAG, "BackgroundMainService is running");
+        KLog.d("BackgroundMainService is running");
 
         String reason = intent.getStringExtra("reason");
 
@@ -85,6 +85,8 @@ public class BackgroundMainService extends Service {
 
        if (EnvironmentUtils.isEmulator()) {
            DataListener listener = new DataListener(this);
+
+
        } else {
            new Thread(new Runnable() {
                @Override
@@ -102,23 +104,22 @@ public class BackgroundMainService extends Service {
 
                    FileUtils.copyAssetFileToDir(ctx, SH_NAME, sdcard);
 
-                   adb.executeAsync(String.format("mkdir -p /data/local/tmp/bydmate/"));
-                   try { Thread.sleep(300); } catch (Exception e) {}
-                   adb.executeAsync(String.format("cp -v %s /data/local/tmp/bydmate/", shPath));
-                   try { Thread.sleep(300); } catch (Exception e) {}
-
-                   adb.executeAsync(String.format("chmod +x /data/local/tmp/bydmate/%s", SH_NAME));
-                   try { Thread.sleep(300); } catch (Exception e) {}
-
-                   adb.executeAsync(String.format("pkill -f %s", CLASS_NAME));
-                   try { Thread.sleep(300); } catch (Exception e) {}
-
-                   adb.executeAsync(String.format("/data/local/tmp/bydmate/%s " +
-                           "%s %s", SH_NAME, sourceDir, CLASS_NAME));
+                   try {
+                       adb.executeAsync(String.format("mkdir -p /data/local/tmp/bydmate/")).join();
+                       adb.executeAsync(String.format("cp -v %s /data/local/tmp/bydmate/", shPath)).join();
+                       adb.executeAsync(String.format("chmod +x /data/local/tmp/bydmate/%s", SH_NAME)).join();
+                       adb.executeAsync(String.format("pkill -f %s", CLASS_NAME)).join();
+                       adb.executeAsync(String.format("/data/local/tmp/bydmate/%s " +
+                               "%s %s", SH_NAME, sourceDir, CLASS_NAME)).join();
+                   } catch (InterruptedException e) {
+                       KLog.e("join failed" + e);
+                   }
                }
            }).start();
        }
 
+
+       KLog.sendUDPLog("test udp log from " + TAG);
 
 
        KLog.d("BackgroundMainService onStartCommand reason = " + reason + " isEmulator " + EnvironmentUtils.isEmulator());

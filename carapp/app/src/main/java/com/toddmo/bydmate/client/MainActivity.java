@@ -7,9 +7,11 @@ import android.content.SharedPreferences;
 import android.content.pm.PackageManager;
 import android.net.Uri;
 import android.os.Bundle;
+import android.os.Handler;
 import android.preference.PreferenceManager;
 import android.provider.Settings;
 import android.view.View;
+import android.widget.TextView;
 import android.widget.Toast;
 
 import androidx.activity.EdgeToEdge;
@@ -22,11 +24,16 @@ import androidx.core.view.WindowInsetsCompat;
 import com.toddmo.bydmate.client.helper.AdbHelper;
 import com.toddmo.bydmate.client.helper.FileUtils;
 import com.toddmo.bydmate.client.BYD.BydManifest;
+import com.toddmo.bydmate.client.utils.DataHolder;
 import com.toddmo.bydmate.client.utils.KLog;
 
 public class MainActivity extends AppCompatActivity {
 
+    private final String TAG = MainActivity.class.getName();
+
     private SharedPreferences preferences;
+    Handler mainHandler = null;
+
 
     public static final String[] BYD_PERMISSIONS = {
             BydManifest.permission.BYDAUTO_BODYWORK_COMMON,
@@ -62,6 +69,30 @@ public class MainActivity extends AppCompatActivity {
         findViewById(R.id.enable_autostart_btn).setOnClickListener(mClickListener);
         findViewById(R.id.disable_autostart_btn).setOnClickListener(mClickListener);
 
+        mainHandler = new Handler(getMainLooper());
+
+
+
+        KLog.setLogCallback(new KLog.LogCallback() {
+            @Override
+            public void onLog(String log) {
+
+                mainHandler.post(new Runnable() {
+                    @Override
+                    public void run() {
+                        TextView logview = findViewById(R.id.logview);
+                        if (logview == null) { return; }
+                        logview.setText(logview.getText() + "\n" + log);
+                    }
+                });
+            }
+        });
+
+        KLog.startReceiveUDPLog();
+
+        KLog.sendUDPLog("test udp log from " + TAG);
+
+
         preferences = PreferenceManager.getDefaultSharedPreferences(this);
 
         boolean autostartEnabled = preferences.getBoolean("autostart_enabled", true); // 默认启用
@@ -70,7 +101,15 @@ public class MainActivity extends AppCompatActivity {
         }
     }
 
+    @Override
+    protected void onDestroy() {
+        super.onDestroy();
+        KLog.setLogCallback(null);
+        KLog.stopReceiveUDPLog();
+    }
+
     private boolean isBydAutoPermissionGranted() {
+//        return true;
         for (String perm : BYD_PERMISSIONS) {
             if (getBaseContext().checkSelfPermission(perm) != PackageManager.PERMISSION_GRANTED) {
                 KLog.e(String.format("permission %s not granted", perm));

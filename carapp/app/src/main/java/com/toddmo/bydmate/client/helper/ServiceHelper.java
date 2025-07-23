@@ -1,8 +1,10 @@
-package com.toddmo.bydmate.client;
+package com.toddmo.bydmate.client.helper;
 
 import android.content.Context;
 import android.content.Intent;
 import android.util.Log;
+
+import com.toddmo.bydmate.client.utils.KLog;
 
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
@@ -11,9 +13,6 @@ public class ServiceHelper {
 
     public static final String TAG = "ServiceHelper";
 
-    public static void log(String msg) {
-        Log.d(TAG, msg);
-    }
 
     public static void startForegroundService(Context context, Intent intent) {
         try {
@@ -21,11 +20,11 @@ public class ServiceHelper {
             Method startForegroundService = clz.getDeclaredMethod("startForegroundService", Intent.class);
             startForegroundService.setAccessible(true);
             startForegroundService.invoke(context, intent);
-            log("startForegroundService success");
+            KLog.d("startForegroundService success");
         } catch (ClassNotFoundException | NoSuchMethodException | IllegalAccessException |
                  InvocationTargetException e) {
             e.printStackTrace();
-            log("startForegroundService failed, error: " + e);
+            KLog.d("startForegroundService failed, error: " + e);
         }
     }
 }

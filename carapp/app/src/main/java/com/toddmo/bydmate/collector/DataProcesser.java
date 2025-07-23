@@ -72,7 +72,7 @@ public class DataProcesser {
     public DataProcesser(Context context) {
         this.context = context;
 //        this.mCaches = new HashMap<>(); // Keep original in-memory cache for now
-        VIN = DataHolder.getInstance().get("VIN");
+        VIN = DataHolder.getInstance().getString("VIN");
 
         // Initialize Room Database
         db = Room.databaseBuilder(context.getApplicationContext(),
@@ -436,6 +436,7 @@ public class DataProcesser {
                         }
                         MqttPayload data = mqttPayloadDao.getCachedDataById(id);
                         if (data != null) {
+                            // TODO: using MqttClient for synchorously sending
                             sendPayloadToMqttSync(data.payload, data.id);
                         }
                     }

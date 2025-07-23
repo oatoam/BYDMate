@@ -15,13 +15,18 @@ public class DataHolder {
         return sInstance;
     }
 
-    Map<String, String> values = new HashMap<String, String>();
+    Map<String, Object> values = new HashMap<String, Object>();
 
-    public static void put(String key, String value) {
+    public static void put(String key, Object value) {
         getInstance().values.put(key, value);
     }
 
-    public static String get(String key) {
-        return getInstance().values.get(key);
+    public static void del(String key) {
+        getInstance().values.remove(key);
     }
+
+    public static String getString(String key) {
+        return (String)getInstance().values.get(key);
+    }
+    public static Object getObject(String key) { return getInstance().values.get(key); }
 }

@@ -1,5 +1,3 @@
-#!/system/bin/sh
-
 echo $0 $@
 
 #ps -ef | grep $0 | grep -v grep | awk '{print $2}' | xargs kill -9 | true

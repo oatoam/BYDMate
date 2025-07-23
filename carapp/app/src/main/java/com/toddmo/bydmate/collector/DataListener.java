@@ -7,7 +7,7 @@ import android.hardware.bydauto.ac.AbsBYDAutoAcListener;
 
 import com.toddmo.bydmate.client.utils.DataHolder;
 import com.toddmo.bydmate.client.utils.EnvironmentUtils;
-import com.toddmo.bydmate.collector.LocationTracker;
+
 import android.hardware.bydauto.ac.BYDAutoAcDevice;
 import android.hardware.bydauto.bodywork.AbsBYDAutoBodyworkListener;
 import android.hardware.bydauto.bodywork.BYDAutoBodyworkDevice;
@@ -106,7 +106,7 @@ public class DataListener {
             fetchFristValueForEachKey();
         }
 
-        String VIN = DataHolder.get("VIN");
+        String VIN = DataHolder.getString("VIN");
         if (VIN == null || VIN.isEmpty()) {
             VIN = "SAMPLE_VIN_XX112233";
             DataHolder.put("VIN", VIN);
