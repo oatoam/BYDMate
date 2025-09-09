@@ -57,7 +57,7 @@ public class AdbHelper {
     };
     AdbCrypto mCrypto = null;
     public boolean setupCrypto(Context context) {
-        String sdcardPath = FileUtils.getSDCardPath(context);
+        String sdcardPath = com.toddmo.bydmate.client.helper.FileUtils.getSDCardPath(context);
         File privateKeyFile = new File(sdcardPath + "/private.key");
         File publicKeyFile = new File(sdcardPath + "/public.key");
         try {

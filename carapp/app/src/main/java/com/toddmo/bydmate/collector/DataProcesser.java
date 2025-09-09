@@ -39,7 +39,7 @@ import java.util.concurrent.Executors;
 public class DataProcesser {
 
     private static final String TAG = "DataProcesser";
-    private static final String MQTT_BROKER_URL = "tcp://123.123.123.123:1883";
+    private static final String MQTT_BROKER_URL = "tcp://1.2.3.4:1883";
     private static final String MQTT_CLIENT_ID_PREFIX = "BYDMateClient-";
     private static final String MQTT_DATA_TOPIC = "bydmate/data";
     private static final String MQTT_ZDATA_TOPIC = "bydmate/zdata";

@@ -1,0 +1,47 @@
+<?xml version="1.0" encoding="utf-8"?>
+<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent">
+
+    <!-- TextureView用于显示画中画内容 -->
+    <TextureView
+        android:id="@+id/surface_view"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent" />
+
+    <!-- 应用配置按钮 -->
+    <FrameLayout
+        android:id="@+id/config_button"
+        android:layout_width="48dp"
+        android:layout_height="48dp"
+        android:layout_marginTop="16dp"
+        android:layout_gravity="center_horizontal|top"
+        android:background="@drawable/ic_more_options"
+        android:clickable="true"
+        android:focusable="true"
+        android:translationZ="4dp"
+        android:padding="8dp">
+        <!-- 三点图标 -->
+        <View
+            android:layout_width="4dp"
+            android:layout_height="4dp"
+            android:layout_gravity="center"
+            android:layout_marginBottom="8dp"
+            android:background="@android:color/white" />
+
+        <View
+            android:layout_width="4dp"
+            android:layout_height="4dp"
+            android:layout_gravity="center"
+            android:background="@android:color/darker_gray" />
+
+        <View
+            android:layout_width="4dp"
+            android:layout_height="4dp"
+            android:layout_gravity="center"
+            android:layout_marginTop="8dp"
+            android:background="@android:color/black" />
+
+    </FrameLayout>
+
+</FrameLayout>

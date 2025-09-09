@@ -1,0 +1,43 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="horizontal"
+    android:background="@android:color/black"
+    android:alpha="0.8"
+    android:gravity="center"
+    android:padding="8dp">
+
+    <!-- 返回按钮 -->
+    <ImageButton
+        android:id="@+id/back_button"
+        android:layout_width="48dp"
+        android:layout_height="48dp"
+        android:layout_marginEnd="16dp"
+        android:background="?android:attr/selectableItemBackground"
+        android:contentDescription="返回"
+        android:src="@android:drawable/ic_media_previous"
+        android:scaleType="fitCenter" />
+
+    <!-- 首页按钮 -->
+    <ImageButton
+        android:id="@+id/home_button"
+        android:layout_width="48dp"
+        android:layout_height="48dp"
+        android:layout_marginEnd="16dp"
+        android:background="?android:attr/selectableItemBackground"
+        android:contentDescription="首页"
+        android:src="@android:drawable/ic_menu_view"
+        android:scaleType="fitCenter" />
+
+    <!-- 多任务按钮 -->
+    <ImageButton
+        android:id="@+id/recent_button"
+        android:layout_width="48dp"
+        android:layout_height="48dp"
+        android:background="?android:attr/selectableItemBackground"
+        android:contentDescription="多任务"
+        android:src="@android:drawable/ic_menu_recent_history"
+        android:scaleType="fitCenter" />
+
+</LinearLayout>

@@ -24,7 +24,9 @@ public class Server {
 
         KLog.d("server running");
 
-        DataListener listener = new DataListener(FakeContext.get());
+        BydMateServer.initialize();
+
+//        DataListener listener = new DataListener(FakeContext.get());
 
         KLog.d("begin looping...");
 

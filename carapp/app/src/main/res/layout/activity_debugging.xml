@@ -1,0 +1,122 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.constraintlayout.widget.ConstraintLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:id="@+id/debug_main"
+    tools:context=".DebuggingActivity" >
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:orientation="horizontal">
+
+        <ScrollView
+            android:orientation="vertical"
+            android:layout_width="0dp"
+            android:layout_height="match_parent"
+            android:layout_weight="1"
+            >
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="vertical"
+                android:padding="16dp">
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="请授予车况助手相关权限，以使部分功能可正常获取车辆数据" />
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="1、设置极速模式白名单" />
+
+                <Button
+                    android:id="@+id/set_fast_mode_btn"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginStart="8dp"
+                    android:text="跳转设置" />
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="2、设置允许开机自启动" />
+
+                <Button
+                    android:id="@+id/set_boot_with_start_btn"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginStart="8dp"
+                    android:text="跳转设置" />
+
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="3、浮窗权限" />
+
+                <Button
+                    android:id="@+id/check_floating_permission_btn"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginStart="8dp"
+                    android:text="检查" />
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="4、比亚迪车辆权限" />
+
+                <Button
+                    android:id="@+id/check_byd_permission_btn"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginStart="8dp"
+                    android:text="检查" />
+
+
+                <Button
+                    android:id="@+id/jump_to_main_btn"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="启动服务" />
+
+                <Button
+                    android:id="@+id/stop_service_btn"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="停止服务" />
+
+                <Button
+                    android:id="@+id/enable_autostart_btn"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="启用自启动" />
+
+                <Button
+                    android:id="@+id/disable_autostart_btn"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="禁用自启动" />
+
+            </LinearLayout>
+        </ScrollView>
+
+        <ScrollView
+            android:orientation="vertical"
+            android:layout_width="0dp"
+            android:layout_height="match_parent"
+            android:layout_weight="1"
+            >
+            <TextView
+                android:id="@+id/logview"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content" />
+        </ScrollView>
+    </LinearLayout>
+
+</androidx.constraintlayout.widget.ConstraintLayout>

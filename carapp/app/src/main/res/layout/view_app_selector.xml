@@ -1,0 +1,117 @@
+<?xml version="1.0" encoding="utf-8"?>
+<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="#80000000">
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_gravity="center"
+        android:layout_margin="16dp"
+        android:orientation="vertical"
+        android:padding="16dp"
+        android:background="@android:color/white"
+        android:elevation="8dp">
+
+        <!-- 标题 -->
+        <TextView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="选择应用"
+            android:textSize="18sp"
+            android:textStyle="bold"
+            android:textColor="@android:color/black"
+            android:gravity="center"
+            android:visibility="gone"
+            android:layout_marginBottom="16dp" />
+
+        <!-- 顶部控制栏 -->
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal"
+            android:layout_marginBottom="16dp"
+            android:gravity="center_vertical">
+
+            <!-- 筛选按钮组 -->
+            <RadioGroup
+                android:id="@+id/filter_radio_group"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:orientation="horizontal"
+                android:gravity="start">
+
+                <RadioButton
+                    android:id="@+id/filter_all"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="不筛选"
+                    android:checked="true"
+                    android:textSize="12sp" />
+
+                <RadioButton
+                    android:id="@+id/filter_map"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="地图"
+                    android:textSize="12sp" />
+
+                <RadioButton
+                    android:id="@+id/filter_music"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="音乐"
+                    android:textSize="12sp" />
+
+            </RadioGroup>
+
+            <!-- 搜索框 -->
+            <EditText
+                android:id="@+id/search_edit_text"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:hint="搜索应用"
+                android:background="@drawable/search_background"
+                android:padding="6dp"
+                android:textSize="12sp"
+                android:layout_marginStart="8dp"
+                android:layout_marginEnd="8dp" />
+
+            <!-- 按钮区域 -->
+            <LinearLayout
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:orientation="horizontal">
+
+                <Button
+                    android:id="@+id/cancel_button"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="取消"
+                    android:textSize="12sp"
+                    style="?android:attr/buttonBarButtonStyle" />
+
+                <Button
+                    android:id="@+id/confirm_button"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="确认"
+                    android:textSize="12sp"
+                    style="?android:attr/buttonBarButtonStyle" />
+
+            </LinearLayout>
+
+        </LinearLayout>
+
+        <!-- 应用列表 -->
+        <androidx.recyclerview.widget.RecyclerView
+            android:id="@+id/app_recycler_view"
+            android:layout_width="match_parent"
+            android:layout_height="400dp" />
+
+    </LinearLayout>
+
+</FrameLayout>
