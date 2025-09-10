@@ -8,8 +8,11 @@ import android.media.projection.MediaProjectionManager;
 import android.net.Uri;
 import android.os.Bundle;
 import android.os.Handler;
+import android.os.RemoteException;
+import android.os.SystemClock;
 import android.preference.PreferenceManager;
 import android.provider.Settings;
+import android.view.KeyEvent;
 import android.view.View;
 import android.widget.Toast;
 
@@ -21,10 +24,14 @@ import androidx.core.graphics.Insets;
 import androidx.core.view.ViewCompat;
 import androidx.core.view.WindowInsetsCompat;
 
+import com.toddmo.bydmate.aidl.IBydMateServer;
+import com.toddmo.bydmate.client.utils.DataHolder;
 import com.toddmo.bydmate.client.utils.KLog;
 import com.toddmo.bydmate.client.widgets.ApplicationPIPView;
 import com.toddmo.bydmate.client.widgets.FloatingWindow;
 import com.toddmo.bydmate.client.widgets.InfoBar;
+import com.toddmo.bydmate.server.BinderParcelable;
+import com.toddmo.bydmate.server.KeyboardMonitorTest;
 
 public class MainActivity extends AppCompatActivity {
 
@@ -51,10 +58,9 @@ public class MainActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
-        // 隐藏状态栏和导航栏
+        // 只隐藏状态栏，保留导航栏
         getWindow().getDecorView().setSystemUiVisibility(
             View.SYSTEM_UI_FLAG_FULLSCREEN |
-            View.SYSTEM_UI_FLAG_HIDE_NAVIGATION |
             View.SYSTEM_UI_FLAG_IMMERSIVE_STICKY
         );
 
@@ -100,7 +106,7 @@ public class MainActivity extends AppCompatActivity {
         infoBar = findViewById(R.id.info_bar);
 
         // 初始化悬浮窗
-//        floatingWindow = new FloatingWindow(this);
+        floatingWindow = new FloatingWindow(this);
 
         // 设置ApplicationPIPView的监听器
         setupPIPViewListeners();
@@ -108,13 +114,42 @@ public class MainActivity extends AppCompatActivity {
         // 设置信息栏显示模式
         updateInfoBarDisplayMode();
 
-        // 显示悬浮窗
-//        floatingWindow.show();
+//         显示悬浮窗
+        floatingWindow.show();
 
         // 初始化ADB连接（用于ADB模式）
         com.toddmo.bydmate.client.helper.AdbHelper adbHelper =
             com.toddmo.bydmate.client.helper.AdbHelper.getInstance();
         adbHelper.setupCrypto(this);
+    }
+
+    private void injectKeyEvent(int keycode) {
+        KLog.d("injectKeyEvent : " + keycode);
+        new Thread(new Runnable() {
+            @Override
+            public void run() {
+                BinderParcelable binder = (BinderParcelable) DataHolder.getObject("service");
+                if (binder == null) {
+                    KLog.e("onBackClick: no valid service");
+                    return;
+                }
+                IBydMateServer server = binder.server;
+                try {
+                    long downtime = SystemClock.uptimeMillis();
+                    KeyEvent downEvent = new KeyEvent(downtime, downtime, KeyEvent.ACTION_DOWN, keycode, 0);
+                    server.injectInputEvent(downEvent, -1);
+                    Thread.sleep(1);
+                    long uptime = SystemClock.uptimeMillis();
+                    KeyEvent upEvent = new KeyEvent(uptime, uptime, KeyEvent.ACTION_UP, keycode, 0);
+                    server.injectInputEvent(upEvent, -1);
+                } catch (RemoteException e) {
+                    KLog.e("onBackClick: failed to injectInputEvent ");
+                } catch (InterruptedException e) {
+                    KLog.e("onBackClick: failed to injectInputEvent sleep");
+                }
+            }
+        }).start();
+
     }
 
     private void setupPIPViewListeners() {
@@ -136,19 +171,22 @@ public class MainActivity extends AppCompatActivity {
                 @Override
                 public void onBackClick() {
                     // 处理返回按钮点击
-                    performGlobalAction(android.accessibilityservice.AccessibilityService.GLOBAL_ACTION_BACK);
+//                    performGlobalAction(android.accessibilityservice.AccessibilityService.GLOBAL_ACTION_BACK);
+                    injectKeyEvent(KeyEvent.KEYCODE_BACK);
                 }
 
                 @Override
                 public void onHomeClick() {
                     // 处理首页按钮点击
-                    performGlobalAction(android.accessibilityservice.AccessibilityService.GLOBAL_ACTION_HOME);
+//                    performGlobalAction(android.accessibilityservice.AccessibilityService.GLOBAL_ACTION_HOME);
+                    injectKeyEvent(KeyEvent.KEYCODE_HOME);
                 }
 
                 @Override
                 public void onRecentClick() {
                     // 处理多任务按钮点击
-                    performGlobalAction(android.accessibilityservice.AccessibilityService.GLOBAL_ACTION_RECENTS);
+//                    performGlobalAction(android.accessibilityservice.AccessibilityService.GLOBAL_ACTION_RECENTS);
+                    injectKeyEvent(KeyEvent.KEYCODE_APP_SWITCH);
                 }
             });
         }
@@ -329,10 +367,9 @@ public class MainActivity extends AppCompatActivity {
     public void onWindowFocusChanged(boolean hasFocus) {
         super.onWindowFocusChanged(hasFocus);
         if (hasFocus) {
-            // 重新隐藏状态栏和导航栏
+            // 只隐藏状态栏，保留导航栏
             getWindow().getDecorView().setSystemUiVisibility(
                 View.SYSTEM_UI_FLAG_FULLSCREEN |
-                View.SYSTEM_UI_FLAG_HIDE_NAVIGATION |
                 View.SYSTEM_UI_FLAG_IMMERSIVE_STICKY
             );
         }

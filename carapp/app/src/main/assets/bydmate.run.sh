@@ -24,6 +24,20 @@ fi
 # Set CLASSPATH to include our DEX
 export CLASSPATH="$DEX_PATH"
 
+# Set JNI library path (include both system and app lib paths)
+JNI_LIB_PATH="/system/lib64"
+if [ -d "/data/app-lib/com.toddmo.bydmate.client" ]; then
+    JNI_LIB_PATH="$JNI_LIB_PATH:/data/app-lib/com.toddmo.bydmate.client"
+fi
+
+APP_LIB_PATH=$(dirname $(pm path com.toddmo.bydmate.client | awk -F':' '{print $NF}'))/lib/arm64/
+if [ -d "${APP_LIB_PATH}" ]; then
+    JNI_LIB_PATH="$JNI_LIB_PATH:${APP_LIB_PATH}"
+fi
+
 # Launch the Server class using app_process
-exec app_process  -Djava.class.path="$DEX_PATH" -Djava.library.path=/system/lib64 /system/bin \
+echo exec app_process  -Djava.class.path="$DEX_PATH" -Djava.library.path="$JNI_LIB_PATH" /system/bin \
+    $CLASS_NAME $@
+
+exec app_process  -Djava.class.path="$DEX_PATH" -Djava.library.path="$JNI_LIB_PATH" /system/bin \
     $CLASS_NAME $@

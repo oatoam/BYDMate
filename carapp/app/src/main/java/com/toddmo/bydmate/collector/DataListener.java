@@ -41,29 +41,42 @@ import android.hardware.bydauto.tyre.BYDAutoTyreDevice;
 
 public class DataListener {
 
-    BYDAutoAcDevice autoAcDevice;
-    BYDAutoBodyworkDevice autoBodyworkDevice;
-    BYDAutoChargingDevice autoChargingDevice;
-    BYDAutoDoorLockDevice autoDoorLockDevice;
-    BYDAutoEnergyDevice autoEnergyDevice;
-    BYDAutoEngineDevice autoEngineDevice;
-    BYDAutoGearboxDevice autoGearboxDevice;
-    BYDAutoInstrumentDevice autoInstrumentDevice;
+    public BYDAutoAcDevice autoAcDevice;
+    public BYDAutoBodyworkDevice autoBodyworkDevice;
+    public BYDAutoChargingDevice autoChargingDevice;
+    public BYDAutoDoorLockDevice autoDoorLockDevice;
+    public BYDAutoEnergyDevice autoEnergyDevice;
+    public BYDAutoEngineDevice autoEngineDevice;
+    public BYDAutoGearboxDevice autoGearboxDevice;
+    public BYDAutoInstrumentDevice autoInstrumentDevice;
     //    BYDAutoLightDevice autoLightDevice;
     //            BYDAutoMultimediaDevice autoMultimediaDevice;
-    BYDAutoPanoramaDevice autoPanoramaDevice;
+    public BYDAutoPanoramaDevice autoPanoramaDevice;
     //            BYDAutoPM2p5Device autoPM2p5Device;
-    BYDAutoRadarDevice autoRadarDevice;
+    public BYDAutoRadarDevice autoRadarDevice;
     //            BYDAutoSafetyBeltDevice autoSafetyBeltDevice;
-    BYDAutoSensorDevice autoSensorDevice;
-    BYDAutoSettingDevice autoSettingDevice;
-    BYDAutoSpeedDevice autoSpeedDevice;
-    BYDAutoStatisticDevice autoStatisticDevice;
+    public BYDAutoSensorDevice autoSensorDevice;
+    public BYDAutoSettingDevice autoSettingDevice;
+    public BYDAutoSpeedDevice autoSpeedDevice;
+    public BYDAutoStatisticDevice autoStatisticDevice;
     //    BYDAutoTimeDevice autoTimeDevice;
-    BYDAutoTyreDevice autoTyreDevice;
+    public BYDAutoTyreDevice autoTyreDevice;
     LocationTracker locationTracker;
 
     Context mContext;
+
+    private static DataListener sInstance = null;
+    public static DataListener getInstance(Context context) {
+        if (sInstance == null) {
+            sInstance = new DataListener(context);
+        }
+        return sInstance;
+    }
+
+    public static DataListener getInstance() {
+        return sInstance;
+    }
+
     public DataListener(Context context) {
         mContext = context;
 

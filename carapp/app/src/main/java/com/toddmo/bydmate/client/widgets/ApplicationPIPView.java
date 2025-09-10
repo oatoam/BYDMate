@@ -252,6 +252,13 @@ public class ApplicationPIPView extends FrameLayout {
         // 设置配置按钮点击监听
         configButton.setOnClickListener(v -> showAppSelector());
 
+        // 设置配置按钮长按监听 - 重置PIPView、销毁和重启virtualdisplay、重启应用
+        configButton.setOnLongClickListener(v -> {
+            KLog.d(TAG + " [" + instanceId + "] Long press detected on config button, resetting PIP view");
+            resetPIPView();
+            return true; // 消费长按事件
+        });
+
         KLog.d(TAG + " initialized with instanceId: " + instanceId);
     }
 
@@ -590,6 +597,47 @@ public class ApplicationPIPView extends FrameLayout {
         // 可以在这里调整画中画的显示参数
         // 比如根据屏幕方向调整分辨率
         KLog.d(TAG + " Orientation changed to: " + (isLandscape ? "landscape" : "portrait"));
+    }
+
+    /**
+     * 重置PIPView：停止应用、销毁virtualdisplay、重启virtualdisplay和应用
+     */
+    private void resetPIPView() {
+        KLog.d(TAG + " [" + instanceId + "] Resetting PIP view");
+
+        // 1. 停止当前应用
+        stopApp();
+
+        // 2. 销毁virtualdisplay
+        if (mVirtualDisplay != null) {
+            KLog.d(TAG + " [" + instanceId + "] Releasing virtual display");
+            mVirtualDisplay.release();
+            mVirtualDisplay = null;
+            displayId = -1;
+        }
+
+        // 3. 重启virtualdisplay
+        if (mSurfaceView != null && mSurfaceView.getSurfaceTexture() != null) {
+            KLog.d(TAG + " [" + instanceId + "] Recreating virtual display");
+            createVirtualDisplayWithSurfaceTexture(mSurfaceView.getSurfaceTexture());
+        }
+
+        // 4. 重启应用（如果有保存的应用配置）
+        if (configManager != null && configManager.hasSavedAppConfig()) {
+            String savedPackageName = configManager.getSelectedAppPackage();
+            if (savedPackageName != null && !savedPackageName.isEmpty()) {
+                KLog.d(TAG + " [" + instanceId + "] Restarting saved app: " + savedPackageName);
+                // 延迟启动，确保virtualdisplay已准备好
+                postDelayed(() -> {
+                    if (displayId != -1) {
+                        startAppOnDisplay(savedPackageName, displayId);
+                    }
+                }, 500); // 500ms延迟
+            }
+        }
+
+        // 显示重置完成提示
+        showError("PIP视图已重置");
     }
 
     @Override

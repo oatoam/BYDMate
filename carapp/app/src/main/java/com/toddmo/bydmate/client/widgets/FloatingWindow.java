@@ -61,13 +61,17 @@ public class FloatingWindow {
 
         layoutParams.format = PixelFormat.RGBA_8888;
         layoutParams.flags = WindowManager.LayoutParams.FLAG_NOT_FOCUSABLE |
-                           WindowManager.LayoutParams.FLAG_NOT_TOUCH_MODAL |
-                           WindowManager.LayoutParams.FLAG_LAYOUT_IN_SCREEN;
+                            WindowManager.LayoutParams.FLAG_NOT_TOUCH_MODAL |
+                            WindowManager.LayoutParams.FLAG_LAYOUT_NO_LIMITS |
+                            WindowManager.LayoutParams.FLAG_LAYOUT_IN_SCREEN;
 
         // 设置悬浮窗位置和大小
+//        layoutParams.gravity = Gravity.BOTTOM | Gravity.CENTER_HORIZONTAL;
         layoutParams.gravity = Gravity.BOTTOM | Gravity.CENTER_HORIZONTAL;
         layoutParams.width = WindowManager.LayoutParams.MATCH_PARENT;
         layoutParams.height = getNavigationBarHeight();
+        layoutParams.y = -getNavigationBarHeight();
+        
 
         // 创建悬浮窗视图
         createFloatingView();

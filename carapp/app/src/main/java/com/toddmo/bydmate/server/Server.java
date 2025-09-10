@@ -26,6 +26,8 @@ public class Server {
 
         BydMateServer.initialize();
 
+//        KeyboardMonitorTest.testAllKeys();
+
 //        DataListener listener = new DataListener(FakeContext.get());
 
         KLog.d("begin looping...");

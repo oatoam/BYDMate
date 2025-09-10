@@ -149,7 +149,7 @@ public class TouchEventHandler {
             KLog.e("no valid service");
             return true;
         }
-        IBydMateServer server = IBydMateServer.Stub.asInterface(binder.mBinder);
+        IBydMateServer server = binder.server;
         try {
             server.injectInputEvent(event, displayId);
         } catch (RemoteException e) {

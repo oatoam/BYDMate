@@ -3,6 +3,7 @@ package com.toddmo.bydmate.aidl;
 
 import android.view.InputEvent;
 // Declare any non-default types here with import statements
+import android.os.ResultReceiver;
 
 interface IBydMateServer {
     /**

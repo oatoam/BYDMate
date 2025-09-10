@@ -8,6 +8,7 @@ import android.os.IBinder;
 import android.os.Parcel;
 import android.os.Parcelable;
 import android.os.RemoteException;
+import android.os.ResultReceiver;
 import android.view.InputEvent;
 import android.view.MotionEvent;
 
@@ -22,7 +23,9 @@ public class BydMateServer {
 
         @Override
         public void injectInputEvent(InputEvent event, int displayId) throws RemoteException {
-            InputManager.setDisplayId(event, displayId);
+            if (displayId >= 0) {
+                InputManager.setDisplayId(event, displayId);
+            }
             if (event instanceof MotionEvent && ((MotionEvent) event).getAction() == 0) {
                 InputManager.syncInputTransactions();
             }
@@ -34,6 +37,8 @@ public class BydMateServer {
                 InputManager.syncInputTransactions();
             }
         }
+
+
     }
 
     private Service mService = new Service();

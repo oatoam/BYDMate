@@ -97,6 +97,9 @@ public class KLog {
     public static void e(String content) {
         print(Log.ERROR, content);
     }
+    public static void e(String TAG, String content) {
+        print(Log.ERROR, content);
+    }
 
     public static void e() {
         e("");
@@ -111,6 +114,9 @@ public class KLog {
     }
 
     public static void w(String content) {
+        print(Log.WARN, content);
+    }
+    public static void w(String TAG,  String content) {
         print(Log.WARN, content);
     }
 
@@ -129,6 +135,9 @@ public class KLog {
     public static void i(String content) {
         print(Log.INFO, content);
     }
+    public static void i(String TAG, String content) {
+        print(Log.INFO, content);
+    }
 
     public static void i() {
         i("");
@@ -145,6 +154,9 @@ public class KLog {
     public static void d(String content) {
         print(Log.DEBUG, content);
     }
+    public static void d(String TAG, String content) {
+        print(Log.DEBUG, content);
+    }
 
     public static void d() {
         d("");
@@ -159,6 +171,9 @@ public class KLog {
     }
 
     public static void v(String content) {
+        print(Log.VERBOSE, content);
+    }
+    public static void v(String TAG,  String content) {
         print(Log.VERBOSE, content);
     }
 

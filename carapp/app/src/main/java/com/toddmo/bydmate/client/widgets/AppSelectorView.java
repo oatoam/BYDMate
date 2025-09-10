@@ -9,9 +9,11 @@ import android.text.Editable;
 import android.text.TextWatcher;
 import android.util.AttributeSet;
 import android.view.View;
+import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.FrameLayout;
+import android.widget.Spinner;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
@@ -36,7 +38,7 @@ public class AppSelectorView extends FrameLayout {
     private OnAppSelectedListener listener;
     private List<AppInfo> appList;
     private AppListAdapter adapter;
-    private android.widget.RadioGroup filterRadioGroup;
+    private Spinner filterSpinner;
     private AppSelectorConfigManager configManager;
 
     public interface OnAppSelectedListener {
@@ -87,18 +89,62 @@ public class AppSelectorView extends FrameLayout {
     }
 
     private void initializeViews() {
-        // 筛选单选按钮组
-        filterRadioGroup = findViewById(R.id.filter_radio_group);
-        filterRadioGroup.setOnCheckedChangeListener((group, checkedId) -> {
-            AppListAdapter.FilterType filterType;
-            if (checkedId == R.id.filter_map) {
-                filterType = AppListAdapter.FilterType.MAP;
-            } else if (checkedId == R.id.filter_music) {
-                filterType = AppListAdapter.FilterType.MUSIC;
-            } else {
-                filterType = AppListAdapter.FilterType.ALL;
+        // 筛选下拉框
+        filterSpinner = findViewById(R.id.filter_spinner);
+
+        // 设置Spinner的数据源
+        String[] filterOptions = {
+            AppListAdapter.FilterType.ALL.getDisplayName(),
+            AppListAdapter.FilterType.MAP.getDisplayName(),
+            AppListAdapter.FilterType.MUSIC.getDisplayName()
+        };
+
+        ArrayAdapter<String> spinnerAdapter = new ArrayAdapter<>(context,
+            android.R.layout.simple_spinner_item, filterOptions);
+        spinnerAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
+        filterSpinner.setAdapter(spinnerAdapter);
+
+        // 防止Spinner展开时退出全屏模式
+        try {
+            java.lang.reflect.Field popupField = android.widget.Spinner.class.getDeclaredField("mPopup");
+            popupField.setAccessible(true);
+            Object popup = popupField.get(filterSpinner);
+            if (popup instanceof android.widget.ListPopupWindow) {
+                android.widget.ListPopupWindow listPopupWindow = (android.widget.ListPopupWindow) popup;
+                listPopupWindow.setModal(false);
+                listPopupWindow.setInputMethodMode(android.widget.PopupWindow.INPUT_METHOD_NOT_NEEDED);
             }
-            adapter.setFilter(filterType);
+        } catch (Exception e) {
+            android.util.Log.w(TAG, "Failed to configure spinner popup window: " + e.getMessage());
+        }
+
+        // 设置默认选择为"不筛选"
+        filterSpinner.setSelection(0);
+
+        // 设置选择监听器
+        filterSpinner.setOnItemSelectedListener(new android.widget.AdapterView.OnItemSelectedListener() {
+            @Override
+            public void onItemSelected(android.widget.AdapterView<?> parent, View view, int position, long id) {
+                AppListAdapter.FilterType filterType;
+                switch (position) {
+                    case 1:
+                        filterType = AppListAdapter.FilterType.MAP;
+                        break;
+                    case 2:
+                        filterType = AppListAdapter.FilterType.MUSIC;
+                        break;
+                    default:
+                        filterType = AppListAdapter.FilterType.ALL;
+                        break;
+                }
+                AppSelectorView.this.adapter.setFilter(filterType);
+            }
+
+            @Override
+            public void onNothingSelected(android.widget.AdapterView<?> parent) {
+                // 默认选择不筛选
+                AppSelectorView.this.adapter.setFilter(AppListAdapter.FilterType.ALL);
+            }
         });
 
         // 搜索框
@@ -127,6 +173,13 @@ public class AppSelectorView extends FrameLayout {
             }
         });
         recyclerView.setAdapter(adapter);
+
+        // 添加调试日志：检查RecyclerView的布局参数
+        android.view.ViewGroup.LayoutParams layoutParams = recyclerView.getLayoutParams();
+        android.util.Log.d(TAG, "RecyclerView height: " + layoutParams.height + "px");
+        android.util.Log.d(TAG, "RecyclerView measured height: " + recyclerView.getMeasuredHeight() + "px");
+        android.util.Log.d(TAG, "App list size: " + appList.size());
+        android.util.Log.d(TAG, "Filtered list size: " + adapter.getItemCount());
 
         // 按钮
         Button cancelButton = findViewById(R.id.cancel_button);

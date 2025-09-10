@@ -16,7 +16,7 @@
         android:layout_marginEnd="16dp"
         android:background="?android:attr/selectableItemBackground"
         android:contentDescription="返回"
-        android:src="@android:drawable/ic_media_previous"
+        android:src="@drawable/triangle_shape"
         android:scaleType="fitCenter" />
 
     <!-- 首页按钮 -->
@@ -27,7 +27,7 @@
         android:layout_marginEnd="16dp"
         android:background="?android:attr/selectableItemBackground"
         android:contentDescription="首页"
-        android:src="@android:drawable/ic_menu_view"
+        android:src="@drawable/circle_shape"
         android:scaleType="fitCenter" />
 
     <!-- 多任务按钮 -->
@@ -37,7 +37,7 @@
         android:layout_height="48dp"
         android:background="?android:attr/selectableItemBackground"
         android:contentDescription="多任务"
-        android:src="@android:drawable/ic_menu_recent_history"
+        android:src="@drawable/square_shape"
         android:scaleType="fitCenter" />
 
 </LinearLayout>

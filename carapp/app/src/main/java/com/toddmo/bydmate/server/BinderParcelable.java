@@ -6,6 +6,8 @@ import android.os.Parcelable;
 
 import androidx.annotation.NonNull;
 
+import com.toddmo.bydmate.aidl.IBydMateServer;
+
 public class BinderParcelable implements Parcelable {
     public static final Parcelable.Creator<BinderParcelable> CREATOR = new Creator<BinderParcelable>() {
         @Override
@@ -19,14 +21,14 @@ public class BinderParcelable implements Parcelable {
         }
     };
 
-    public IBinder mBinder;
+    public IBydMateServer server;
 
-    public BinderParcelable(IBinder binder) {
-        this.mBinder = binder;
+    public BinderParcelable(IBydMateServer binder) {
+        this.server = binder;
     }
 
     public BinderParcelable(Parcel source) {
-        this.mBinder = source.readStrongBinder();
+        this.server = IBydMateServer.Stub.asInterface(source.readStrongBinder());
     }
 
     @Override
@@ -36,6 +38,6 @@ public class BinderParcelable implements Parcelable {
 
     @Override
     public void writeToParcel(@NonNull Parcel dest, int flags) {
-        dest.writeStrongBinder(mBinder);
+        dest.writeStrongBinder((IBinder)server);
     }
 }

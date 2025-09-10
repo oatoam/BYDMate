@@ -22,7 +22,7 @@ public class AppListAdapter extends RecyclerView.Adapter<AppListAdapter.AppViewH
 
     // 筛选类型枚举
     public enum FilterType {
-        ALL("不筛选"),
+        ALL("全部"),
         MAP("地图"),
         MUSIC("音乐");
 
