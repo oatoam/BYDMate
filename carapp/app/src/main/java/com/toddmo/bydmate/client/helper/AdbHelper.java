@@ -145,7 +145,7 @@ public class AdbHelper {
                         KLog.v("shell output: " + new String(data));
                     }
                 } catch (IOException e) {
-                    e.printStackTrace();
+//                    e.printStackTrace();
                 }
 
             } catch (IOException | InterruptedException e) {

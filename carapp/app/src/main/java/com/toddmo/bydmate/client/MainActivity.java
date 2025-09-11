@@ -1,6 +1,7 @@
 package com.toddmo.bydmate.client;
 
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.content.res.Configuration;
 import android.hardware.display.VirtualDisplay;
 import android.media.projection.MediaProjection;
@@ -17,6 +18,7 @@ import android.view.View;
 import android.widget.Toast;
 
 import androidx.activity.EdgeToEdge;
+import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.constraintlayout.widget.ConstraintLayout;
 import androidx.constraintlayout.widget.ConstraintSet;
@@ -32,6 +34,8 @@ import com.toddmo.bydmate.client.widgets.FloatingWindow;
 import com.toddmo.bydmate.client.widgets.InfoBar;
 import com.toddmo.bydmate.server.BinderParcelable;
 import com.toddmo.bydmate.server.KeyboardMonitorTest;
+
+import java.util.Map;
 
 public class MainActivity extends AppCompatActivity {
 
@@ -217,8 +221,8 @@ public class MainActivity extends AppCompatActivity {
 
     private void setupDividerTouchListener() {
         // 设置调节杆的触摸监听器
-        dividerVertical.setOnTouchListener(new DividerTouchListener(this::updatePrimaryRatio));
-        dividerHorizontal.setOnTouchListener(new DividerTouchListener(this::updatePrimaryRatio));
+        dividerVertical.setOnTouchListener(new DividerTouchListener(this::updatePrimaryRatio, false)); // vertical
+        dividerHorizontal.setOnTouchListener(new DividerTouchListener(this::updatePrimaryRatio, true)); // horizontal
     }
 
     private void updatePrimaryRatio(float ratio) {
@@ -226,11 +230,30 @@ public class MainActivity extends AppCompatActivity {
         updateLayoutConstraints();
     }
 
+    private void swapRegions() {
+        KLog.d(TAG + " Swapping primary and secondary regions");
+
+        SharedPreferences preferences = PreferenceManager.getDefaultSharedPreferences(this);
+
+        boolean swap = preferences.getBoolean("swapregion", false);
+
+        preferences.edit().putBoolean("swapregion", !swap).apply();
+
+        boolean newswap = preferences.getBoolean("swapregion", false);
+
+        KLog.d(String.format("swapregion from %s to %s", swap, newswap));
+        // 更新布局约束
+        updateLayoutConstraints();
+    }
+
     private void updateLayoutConstraints() {
         ConstraintSet constraintSet = new ConstraintSet();
         constraintSet.clone(mainContainer);
-        KLog.d("Updating layout constraints: " + primaryRatio);
+        SharedPreferences preferences = PreferenceManager.getDefaultSharedPreferences(this);
 
+        boolean swap = preferences.getBoolean("swapregion", false);
+
+        KLog.d("Updating layout constraints primaryRatio: " + primaryRatio + " swapregion: " + swap);
         // 记录容器尺寸
         KLog.d("Main container size: " + mainContainer.getWidth() + "x" + mainContainer.getHeight());
 
@@ -257,11 +280,31 @@ public class MainActivity extends AppCompatActivity {
             constraintSet.connect(R.id.secondary_region, ConstraintSet.TOP, ConstraintSet.PARENT_ID, ConstraintSet.TOP);
             constraintSet.connect(R.id.secondary_region, ConstraintSet.BOTTOM, ConstraintSet.PARENT_ID, ConstraintSet.BOTTOM);
 
-            // 确保divider位置正确
-            constraintSet.connect(R.id.divider_vertical, ConstraintSet.START, R.id.primary_region, ConstraintSet.END);
-            constraintSet.connect(R.id.divider_vertical, ConstraintSet.END, R.id.secondary_region, ConstraintSet.START);
-            constraintSet.connect(R.id.divider_vertical, ConstraintSet.TOP, ConstraintSet.PARENT_ID, ConstraintSet.TOP);
-            constraintSet.connect(R.id.divider_vertical, ConstraintSet.BOTTOM, ConstraintSet.PARENT_ID, ConstraintSet.BOTTOM);
+            if (swap) {
+                constraintSet.connect(R.id.primary_region, ConstraintSet.START, R.id.divider_vertical, ConstraintSet.END);
+                constraintSet.connect(R.id.primary_region, ConstraintSet.END, ConstraintSet.PARENT_ID, ConstraintSet.END);
+                constraintSet.connect(R.id.secondary_region, ConstraintSet.START, ConstraintSet.PARENT_ID, ConstraintSet.START);
+                constraintSet.connect(R.id.secondary_region, ConstraintSet.END, R.id.divider_vertical, ConstraintSet.START);
+
+                // 确保divider位置正确
+                constraintSet.connect(R.id.divider_vertical, ConstraintSet.START, R.id.secondary_region, ConstraintSet.END);
+                constraintSet.connect(R.id.divider_vertical, ConstraintSet.END, R.id.primary_region, ConstraintSet.START);
+                constraintSet.connect(R.id.divider_vertical, ConstraintSet.TOP, ConstraintSet.PARENT_ID, ConstraintSet.TOP);
+                constraintSet.connect(R.id.divider_vertical, ConstraintSet.BOTTOM, ConstraintSet.PARENT_ID, ConstraintSet.BOTTOM);
+            } else {
+                constraintSet.connect(R.id.primary_region, ConstraintSet.START, ConstraintSet.PARENT_ID, ConstraintSet.START);
+                constraintSet.connect(R.id.primary_region, ConstraintSet.END, R.id.divider_vertical, ConstraintSet.START);
+                constraintSet.connect(R.id.secondary_region, ConstraintSet.START, R.id.divider_vertical, ConstraintSet.END);
+                constraintSet.connect(R.id.secondary_region, ConstraintSet.END, ConstraintSet.PARENT_ID, ConstraintSet.END);
+
+                // 确保divider位置正确
+                constraintSet.connect(R.id.divider_vertical, ConstraintSet.START, R.id.primary_region, ConstraintSet.END);
+                constraintSet.connect(R.id.divider_vertical, ConstraintSet.END, R.id.secondary_region, ConstraintSet.START);
+                constraintSet.connect(R.id.divider_vertical, ConstraintSet.TOP, ConstraintSet.PARENT_ID, ConstraintSet.TOP);
+                constraintSet.connect(R.id.divider_vertical, ConstraintSet.BOTTOM, ConstraintSet.PARENT_ID, ConstraintSet.BOTTOM);
+            }
+
+
         } else {
             // 竖屏模式：上下分布
             KLog.d("Setting portrait constraints");
@@ -285,12 +328,26 @@ public class MainActivity extends AppCompatActivity {
             constraintSet.connect(R.id.secondary_region, ConstraintSet.START, ConstraintSet.PARENT_ID, ConstraintSet.START);
             constraintSet.connect(R.id.secondary_region, ConstraintSet.END, ConstraintSet.PARENT_ID, ConstraintSet.END);
 
+            if (swap) {
+                constraintSet.connect(R.id.primary_region, ConstraintSet.TOP, R.id.divider_vertical, ConstraintSet.BOTTOM);
+                constraintSet.connect(R.id.primary_region, ConstraintSet.BOTTOM, ConstraintSet.PARENT_ID, ConstraintSet.BOTTOM);
+                constraintSet.connect(R.id.secondary_region, ConstraintSet.TOP, ConstraintSet.PARENT_ID, ConstraintSet.TOP);
+                constraintSet.connect(R.id.secondary_region, ConstraintSet.BOTTOM, R.id.divider_vertical, ConstraintSet.TOP);
+            } else {
+                constraintSet.connect(R.id.primary_region, ConstraintSet.TOP, ConstraintSet.PARENT_ID, ConstraintSet.TOP);
+                constraintSet.connect(R.id.primary_region, ConstraintSet.BOTTOM, R.id.divider_vertical, ConstraintSet.TOP);
+                constraintSet.connect(R.id.secondary_region, ConstraintSet.TOP, R.id.divider_vertical, ConstraintSet.BOTTOM);
+                constraintSet.connect(R.id.secondary_region, ConstraintSet.BOTTOM, ConstraintSet.PARENT_ID, ConstraintSet.BOTTOM);
+            }
+
             // 确保divider位置正确
             constraintSet.connect(R.id.divider_horizontal, ConstraintSet.TOP, R.id.primary_region, ConstraintSet.BOTTOM);
             constraintSet.connect(R.id.divider_horizontal, ConstraintSet.BOTTOM, R.id.secondary_region, ConstraintSet.TOP);
             constraintSet.connect(R.id.divider_horizontal, ConstraintSet.START, ConstraintSet.PARENT_ID, ConstraintSet.START);
             constraintSet.connect(R.id.divider_horizontal, ConstraintSet.END, ConstraintSet.PARENT_ID, ConstraintSet.END);
         }
+
+
 
         constraintSet.applyTo(mainContainer);
 
@@ -411,31 +468,92 @@ public class MainActivity extends AppCompatActivity {
 
     // DividerTouchListener 内部类用于处理调节杆拖拽
     private class DividerTouchListener implements View.OnTouchListener {
+        private final float minSlideDistance; // 最小滑动距离阈值（像素）
         private float lastX, lastY;
+        private float initialX, initialY; // 初始触摸位置
         private float accumulatedTranslationX = 0; // 累积的水平位移
         private float accumulatedTranslationY = 0; // 累积的垂直位移
         private final RatioUpdateCallback callback;
+        private final boolean isHorizontal;
+        private final Handler handler = new Handler(getMainLooper());
+        private boolean isInteractive = false; // 是否已进入交互状态
+        private long lastClickTime = 0; // 上次点击时间
+        private static final long DOUBLE_CLICK_TIME_DELTA = 300; // 双击时间间隔（毫秒）
+        private final Runnable resetToDefaultRunnable = new Runnable() {
+            @Override
+            public void run() {
+                resetToDefaultState();
+            }
+        };
 
-        DividerTouchListener(RatioUpdateCallback callback) {
+        DividerTouchListener(RatioUpdateCallback callback, boolean isHorizontal) {
             this.callback = callback;
+            this.isHorizontal = isHorizontal;
+
+            // 根据调节杆尺寸计算最小滑动距离阈值
+            if (isHorizontal) {
+                // 水平调节杆：基于高度的1.5倍
+                float dividerHeight = dividerHorizontal.getHeight();
+                this.minSlideDistance = dividerHeight > 0 ? dividerHeight * 1.5f : 24.0f * 1.5f; // 默认24dp的1.5倍
+            } else {
+                // 垂直调节杆：基于宽度的1.5倍
+                float dividerWidth = dividerVertical.getWidth();
+                this.minSlideDistance = dividerWidth > 0 ? dividerWidth * 1.5f : 12.0f * 1.5f; // 默认12dp的1.5倍
+            }
         }
 
         @Override
         public boolean onTouch(View v, android.view.MotionEvent event) {
+
+            SharedPreferences preferences = PreferenceManager.getDefaultSharedPreferences(MainActivity.this);
+            boolean swapregion = preferences.getBoolean("swapregion", false);
+
+
             switch (event.getAction()) {
                 case android.view.MotionEvent.ACTION_DOWN:
-                    lastX = event.getRawX();
-                    lastY = event.getRawY();
+                    long clickTime = System.currentTimeMillis();
+                    // 检测双击
+                    if (clickTime - lastClickTime < DOUBLE_CLICK_TIME_DELTA) {
+                        // 双击检测成功，交换区域位置
+                        swapRegions();
+                        lastClickTime = 0; // 重置点击时间
+                        return true;
+                    }
+                    lastClickTime = clickTime;
+
+                    initialX = event.getRawX();
+                    initialY = event.getRawY();
+                    lastX = initialX;
+                    lastY = initialY;
                     // 重置累积位移
                     accumulatedTranslationX = 0;
                     accumulatedTranslationY = 0;
-                    // 高亮分割线
-                    v.setBackgroundColor(getResources().getColor(android.R.color.holo_blue_light));
+                    // 重置交互状态
+                    isInteractive = false;
+                    // 取消之前的延迟重置
+                    handler.removeCallbacks(resetToDefaultRunnable);
+                    // 不立即切换到交互状态，等待滑动距离超过阈值
                     return true;
 
                 case android.view.MotionEvent.ACTION_MOVE:
                     float deltaX = event.getRawX() - lastX;
                     float deltaY = event.getRawY() - lastY;
+
+                    // 计算从初始位置的总移动距离
+                    float totalDeltaX = event.getRawX() - initialX;
+                    float totalDeltaY = event.getRawY() - initialY;
+                    float distance = (float) Math.sqrt(totalDeltaX * totalDeltaX + totalDeltaY * totalDeltaY);
+
+                    // 如果移动距离未超过阈值，不进行任何操作
+                    if (distance < minSlideDistance) {
+                        return true;
+                    }
+
+                    // 超过阈值，进入交互状态
+                    if (!isInteractive) {
+                        isInteractive = true;
+                        setInteractiveState(v);
+                    }
 
                     if (isLandscape) {
                         // 横屏模式：水平移动divider
@@ -444,7 +562,7 @@ public class MainActivity extends AppCompatActivity {
                             // 累积位移
                             accumulatedTranslationX += deltaX;
                             // 计算基于当前比例的divider中心位置
-                            float currentDividerCenterX = primaryRatio * containerWidth;
+                            float currentDividerCenterX = (swapregion ? 1-primaryRatio : primaryRatio) * containerWidth;
                             // 计算新的divider中心位置
                             float newDividerCenterX = currentDividerCenterX + accumulatedTranslationX;
                             // 限制在合理范围内
@@ -463,7 +581,7 @@ public class MainActivity extends AppCompatActivity {
                             // 累积位移
                             accumulatedTranslationY += deltaY;
                             // 计算基于当前比例的divider中心位置
-                            float currentDividerCenterY = primaryRatio * containerHeight;
+                            float currentDividerCenterY = (swapregion ? 1-primaryRatio : primaryRatio) * containerHeight;
                             // 计算新的divider中心位置
                             float newDividerCenterY = currentDividerCenterY + accumulatedTranslationY;
                             // 限制在合理范围内
@@ -482,44 +600,72 @@ public class MainActivity extends AppCompatActivity {
                     return true;
 
                 case android.view.MotionEvent.ACTION_UP:
-                    // 根据divider的最终位置计算比例
-                    float finalRatio = primaryRatio;
-                    if (isLandscape) {
-                        // 横屏模式：根据divider的最终位置计算比例
-                        float containerWidth = mainContainer.getWidth();
-                        if (containerWidth > 0) {
-                            float currentDividerCenterX = primaryRatio * containerWidth;
-                            float finalDividerCenterX = currentDividerCenterX + v.getTranslationX();
-                            finalRatio = finalDividerCenterX / containerWidth;
-                            finalRatio = Math.max(0.1f, Math.min(0.9f, finalRatio));
+                    // 只有在进入交互状态的情况下才进行布局调整
+                    if (isInteractive) {
+                        // 根据divider的最终位置计算比例
+                        float finalRatio = (swapregion ? 1-primaryRatio : primaryRatio);
+                        if (isLandscape) {
+                            // 横屏模式：根据divider的最终位置计算比例
+                            float containerWidth = mainContainer.getWidth();
+                            if (containerWidth > 0) {
+                                float currentDividerCenterX = (swapregion ? 1-primaryRatio : primaryRatio) * containerWidth;
+                                float finalDividerCenterX = currentDividerCenterX + v.getTranslationX();
+                                finalRatio = finalDividerCenterX / containerWidth;
+                                finalRatio = Math.max(0.1f, Math.min(0.9f, finalRatio));
+                            }
+                        } else {
+                            // 竖屏模式：根据divider的最终位置计算比例
+                            float containerHeight = mainContainer.getHeight();
+                            if (containerHeight > 0) {
+                                float currentDividerCenterY = (swapregion ? 1-primaryRatio : primaryRatio) * containerHeight;
+                                float finalDividerCenterY = currentDividerCenterY + v.getTranslationY();
+                                finalRatio = finalDividerCenterY / containerHeight;
+                                finalRatio = Math.max(0.1f, Math.min(0.9f, finalRatio));
+                            }
                         }
+
+                        // 重置divider的translation
+                        v.setTranslationX(0);
+                        v.setTranslationY(0);
+
+                        // 应用最终比例并刷新布局
+                        if (finalRatio != (swapregion ? 1-primaryRatio : primaryRatio)) {
+
+                            if (swapregion) {
+                                primaryRatio = 1 - finalRatio;
+                            } else {
+                                primaryRatio = finalRatio;
+                            }
+                            updateLayoutConstraints();
+                            KLog.d(TAG + " Layout updated with final ratio: " + primaryRatio);
+                        }
+
+                        // 延迟切换回默认状态
+                        handler.postDelayed(resetToDefaultRunnable, 3000); // 500ms延迟
                     } else {
-                        // 竖屏模式：根据divider的最终位置计算比例
-                        float containerHeight = mainContainer.getHeight();
-                        if (containerHeight > 0) {
-                            float currentDividerCenterY = primaryRatio * containerHeight;
-                            float finalDividerCenterY = currentDividerCenterY + v.getTranslationY();
-                            finalRatio = finalDividerCenterY / containerHeight;
-                            finalRatio = Math.max(0.1f, Math.min(0.9f, finalRatio));
-                        }
+                        // 未进入交互状态，重置divider的translation（以防万一）
+                        v.setTranslationX(0);
+                        v.setTranslationY(0);
                     }
-
-                    // 重置divider的translation
-                    v.setTranslationX(0);
-                    v.setTranslationY(0);
-
-                    // 应用最终比例并刷新布局
-                    if (finalRatio != primaryRatio) {
-                        primaryRatio = finalRatio;
-                        updateLayoutConstraints();
-                        KLog.d(TAG + " Layout updated with final ratio: " + primaryRatio);
-                    }
-
-                    // 恢复分割线颜色
-                    v.setBackgroundColor(getResources().getColor(android.R.color.white));
                     return true;
             }
             return false;
+        }
+
+        private void setInteractiveState(View v) {
+            if (isHorizontal) {
+                v.setBackgroundResource(R.drawable.divider_horizontal_interactive);
+            } else {
+                v.setBackgroundResource(R.drawable.divider_vertical_interactive);
+            }
+        }
+
+        private void resetToDefaultState() {
+            if (isHorizontal) {
+                dividerHorizontal.setBackgroundResource(R.drawable.divider_horizontal_default);
+            } else {
+                dividerVertical.setBackgroundResource(R.drawable.divider_vertical_default);
+            }
         }
     }
 }

@@ -43,7 +43,10 @@
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
                 <category android:name="android.intent.category.HOME_ONLY" />
-                <category android:name="android.intent.category.HOME" />
+                <!-- remove category.HOME for bypass BYD's PackageInstaller's launcher check -->
+                <!-- but it's necessary for debugging in normal Android 11+ device -->
+                <!-- without ...HOME, we cannot fetch all application list directly -->
+<!--                <category android:name="android.intent.category.HOME" />-->
                 <category android:name="android.intent.category.DEFAULT" />
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>

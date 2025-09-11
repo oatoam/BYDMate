@@ -48,21 +48,27 @@
     <!-- 垂直调节杆 -->
     <View
         android:id="@+id/divider_vertical"
-        android:layout_width="20dp"
+        android:layout_width="12dp"
         android:layout_height="0dp"
-        android:background="@android:color/white"
+        android:background="@drawable/divider_vertical_default"
+        android:elevation="4dp"
         app:layout_constraintStart_toEndOf="@id/primary_region"
+        app:layout_constraintEnd_toStartOf="@id/secondary_region"
         app:layout_constraintTop_toTopOf="parent"
-        app:layout_constraintBottom_toTopOf="@id/floating_window_placeholder" />
+        app:layout_constraintBottom_toTopOf="@id/floating_window_placeholder"
+        />
 
     <!-- 水平调节杆 -->
     <View
         android:id="@+id/divider_horizontal"
         android:layout_width="0dp"
-        android:layout_height="20dp"
-        android:background="@android:color/white"
+        android:layout_height="24dp"
+        android:background="@drawable/divider_horizontal_default"
+        android:elevation="4dp"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/primary_region"
+        app:layout_constraintBottom_toTopOf="@id/secondary_region"
         android:visibility="gone" />
 
     <!-- 悬浮窗占位符 -->
